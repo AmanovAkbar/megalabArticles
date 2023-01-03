@@ -1,7 +1,10 @@
 package com.megalab.articlesite.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,11 +38,19 @@ public class User {
         @Size(max = 120)
         @Column(name = "password")
         private String password;
+        @Nullable
+        @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+        @JoinColumn(name = "picture_id")
+        private Picture picture;
+        @OneToMany(mappedBy = "creator")
+        private Set<Article> userArticles;
+
 
         @ManyToMany(fetch = FetchType.EAGER)
         @JoinTable(	name = "user_roles",
                 joinColumns = @JoinColumn(name = "user_id"),
                 inverseJoinColumns = @JoinColumn(name = "role_id"))
+
         private Set<Role> roles = new HashSet<>();
 
 
@@ -98,4 +109,22 @@ public class User {
         public void setRoles(Set<Role> roles) {
                 this.roles = roles;
         }
+
+        public Picture getPicture() {
+                return picture;
+        }
+
+        public void setPicture(Picture picture) {
+                this.picture = picture;
+        }
+
+        public Set<Article> getUserArticles() {
+                return userArticles;
+        }
+
+        public void setUserArticles(Set<Article> userArticles) {
+                this.userArticles = userArticles;
+        }
+
+
 }

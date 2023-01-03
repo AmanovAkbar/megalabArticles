@@ -17,8 +17,19 @@ public class RequestSignup {
     @NotBlank
     @Size(min = 5, max = 50)
     private String password;
-
+    @NotBlank
+    @Size(min = 5, max = 50)
+    private String secondPassword;
     private Set<String> role;
+
+
+    public String getSecondPassword() {
+        return secondPassword;
+    }
+
+    public void setSecondPassword(String secondPassword) {
+        this.secondPassword = secondPassword;
+    }
 
     public String getFirstname() {
         return firstname;

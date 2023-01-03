@@ -81,7 +81,10 @@ public class AuthService {
 
 
         if (userRepository.existsByUsername(requestSignup.getUsername())) {
-            ResponseEntity.badRequest().body(new ResponseMessage("Error: Email is already in use!"));
+            return ResponseEntity.badRequest().body(new ResponseMessage("Error: Username is already in use!"));
+        }
+        if (!requestSignup.getSecondPassword().contentEquals(requestSignup.getPassword())){
+            return ResponseEntity.badRequest().body((new ResponseMessage("Error: Passwords should match!")));
         }
 
         // Create new user's account
