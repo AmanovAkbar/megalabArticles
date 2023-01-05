@@ -2,6 +2,9 @@ package com.megalab.articlesite.model;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "commentary")
 public class Commentary {
@@ -17,6 +20,8 @@ public class Commentary {
     @ManyToOne
     @JoinColumn(name = "replied_id")
     private Commentary replied;
+    @OneToMany(mappedBy = "replied")
+    private Set<Commentary> replies = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "article_id")

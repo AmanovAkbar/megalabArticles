@@ -43,8 +43,13 @@ public class User {
         @JoinColumn(name = "picture_id")
         private Picture picture;
         @OneToMany(mappedBy = "creator")
-        private Set<Article> userArticles;
+        private Set<Article> userArticles = new HashSet<>();
 
+        @ManyToMany(fetch = FetchType.EAGER)
+        @JoinTable(name="user_favourites",
+                joinColumns = @JoinColumn(name = "user_id"),
+                inverseJoinColumns = @JoinColumn(name = "article_id"))
+        private Set<Article> favouriteArticles = new HashSet<>();
 
         @ManyToMany(fetch = FetchType.EAGER)
         @JoinTable(	name = "user_roles",
@@ -126,5 +131,11 @@ public class User {
                 this.userArticles = userArticles;
         }
 
+        public Set<Article> getFavouriteArticles() {
+                return favouriteArticles;
+        }
 
+        public void setFavouriteArticles(Set<Article> favouriteArticles) {
+                this.favouriteArticles = favouriteArticles;
+        }
 }
