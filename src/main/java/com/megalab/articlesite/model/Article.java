@@ -56,11 +56,11 @@ public class Article {
     private User creator;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(	name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(	name = "article_category",
+            joinColumns = @JoinColumn(name = "article_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
 
-    private Set<Role> roles = new HashSet<>();
+    private Set<Category> categories = new HashSet<>();
 
     public Article(String title, Picture picture, String description, String body, User creator) {
         this.title = title;
@@ -137,11 +137,11 @@ public class Article {
         this.creator = creator;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public Set<Category> getCategories() {
+        return categories;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
     }
 }

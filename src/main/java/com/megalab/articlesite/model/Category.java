@@ -16,6 +16,8 @@ public class Category {
     @Size(max=20)
     String name;
 
+
+
     public Long getId() {
         return id;
     }
