@@ -4,6 +4,8 @@ import com.megalab.articlesite.model.Picture;
 import com.megalab.articlesite.repository.PictureRepository;
 import com.megalab.articlesite.security.jwt.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,17 +35,29 @@ public class PictureService {
             throw new RuntimeException("There was a mistake reading contents of an image.");
         }
     }
+    @Cacheable(
+            value = "pictureCache",
+            key = "#picture.id"
+    )
     public ResponseEntity<byte[]>getPicture(Picture picture){
         return  ResponseEntity.ok().contentLength(picture.getData().length)
                 .contentType(MediaType.parseMediaType(picture.getContentType()))
                 .body(picture.getData());
     }
+    @Cacheable(
+            value = "pictureCache",
+            key = "#id"
+    )
     public ResponseEntity<byte[]>getPictureById(Long id){
         Picture picture = pictureRepository.findById(id).orElseThrow(()->new NoSuchElementException("There is no such picture!"));
         return  ResponseEntity.ok().contentLength(picture.getData().length)
                 .contentType(MediaType.parseMediaType(picture.getContentType()))
                 .body(picture.getData());
     }
+    @CacheEvict(
+            value = "pictureCache",
+            key = "#id"
+    )
     public ResponseEntity<ResponseMessage>deletePicture(long id){
         if(pictureRepository.existsById(id)){
             pictureRepository.deleteById(id);

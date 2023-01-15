@@ -11,6 +11,9 @@ import com.megalab.articlesite.response.ResponseMainPageArticle;
 import com.megalab.articlesite.security.jwt.response.ResponseMessage;
 import com.megalab.articlesite.security.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +39,7 @@ public class ArticleService {
     RoleRepository roleRepository;
     @Autowired
     PictureService pictureService;
+
 
     public ResponseEntity<Map<String, Object>> getArticlesForMainPage(String query, int page,
                                                                       int size, String categoryName){
@@ -70,6 +74,7 @@ public class ArticleService {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     public ResponseEntity<ResponseMessage>addToFavourites(long articleId){
         try {
             UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext()
@@ -97,7 +102,9 @@ public class ArticleService {
                 requestArticle.getDescription(), requestArticle.getBody(), user, category);
         return articleRepository.save(article);
     }
-
+    @CachePut(
+            value = "articleCache",
+            key = "#id")
     public Article editArticle (long id, RequestArticle requestArticle){
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -133,6 +140,8 @@ public class ArticleService {
 
         return articleRepository.save(article);
     }
+    @CacheEvict(value = "articleCache",
+            key = "#id")
     public void deleteArticle (long id){
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -149,16 +158,15 @@ public class ArticleService {
 
         articleRepository.deleteById(id);
     }
-    public ResponseEntity<ResponseArticle>getArticle(long articleId){
-        Article article = articleRepository.findById(articleId)
+    @Cacheable(
+            value = "articleCache",
+            key = "#articleId"
+    )
+    public Article getArticle(long articleId){
+        return articleRepository.findById(articleId)
                 .orElseThrow(()->new NoSuchElementException("There is no such article!"));
-        String pictureUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/images/").path(String.valueOf(article.getPicture().getId())).toUriString();
-        long creatorId = article.getCreator().getId();
-        String categoryName = article.getCategory().getName();
-        return ResponseEntity.ok(new ResponseArticle(articleId, article.getTitle(), pictureUri,
-                article.getDescription(), article.getBody(), article.getCreatedAt(), creatorId, categoryName));
     }
+
 
     public ResponseEntity<Map<String, Object>> getFavouriteArticle(int page, int size, long user_id){
         try{
@@ -171,6 +179,7 @@ public class ArticleService {
             return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
         }
     }
+
     public ResponseEntity<Map<String, Object>> getArticlesByCreator(int page, int size, long user_id){
         try{
             Pageable paging = PageRequest.of(page, size);

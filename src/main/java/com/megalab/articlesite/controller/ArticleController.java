@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -61,7 +62,13 @@ public class ArticleController {
     @GetMapping("/article/{id}")
     public ResponseEntity<ResponseArticle>getArticle(@PathVariable long id){
         try{
-            return articleService.getArticle(id);
+            Article article = articleService.getArticle(id);
+            String pictureUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/images/").path(String.valueOf(article.getPicture().getId())).toUriString();
+            long creatorId = article.getCreator().getId();
+            String categoryName = article.getCategory().getName();
+            return ResponseEntity.ok(new ResponseArticle(id, article.getTitle(), pictureUri,
+                    article.getDescription(), article.getBody(), article.getCreatedAt(), creatorId, categoryName));
         }catch (Exception e){
             return  ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
         }
