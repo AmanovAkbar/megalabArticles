@@ -1,5 +1,6 @@
 package com.megalab.articlesite.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -37,6 +38,7 @@ public class User {
         @NotBlank
         @Size(max = 120)
         @Column(name = "password")
+        @JsonIgnore
         private String password;
         @Nullable
         @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

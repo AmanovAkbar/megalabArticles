@@ -41,4 +41,9 @@ public class UserService {
         long pictureId = user.getPicture().getId();
         return pictureService.deletePicture(pictureId);
     }
+    public ResponseEntity<ResponseMessage>deleteProfilePicture(long id){
+        User user = userRepository.findUserById(id).orElseThrow(()->new RuntimeException("There is no such user!"));
+        long pictureId = user.getPicture().getId();
+        return pictureService.deletePicture(pictureId);
+    }
 }

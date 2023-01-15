@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
+
 @Service
 public class PictureService {
     @Autowired
@@ -32,6 +34,12 @@ public class PictureService {
         }
     }
     public ResponseEntity<byte[]>getPicture(Picture picture){
+        return  ResponseEntity.ok().contentLength(picture.getData().length)
+                .contentType(MediaType.parseMediaType(picture.getContentType()))
+                .body(picture.getData());
+    }
+    public ResponseEntity<byte[]>getPictureById(Long id){
+        Picture picture = pictureRepository.findById(id).orElseThrow(()->new NoSuchElementException("There is no such picture!"));
         return  ResponseEntity.ok().contentLength(picture.getData().length)
                 .contentType(MediaType.parseMediaType(picture.getContentType()))
                 .body(picture.getData());

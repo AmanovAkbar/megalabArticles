@@ -5,17 +5,17 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "article")
 public class Article {
     @Id
@@ -42,35 +42,42 @@ public class Article {
     private String body;
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDate createdAt;
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
 
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private User creator;
+    @ManyToMany(mappedBy = "favouriteArticles", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<User> favoured = new HashSet<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(	name = "article_category",
-            joinColumns = @JoinColumn(name = "article_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Category category;
 
-    private Set<Category> categories = new HashSet<>();
-
-    public Article(String title, Picture picture, String description, String body, User creator) {
+    public Article(String title, Picture picture, String description, String body, User creator, Category category) {
         this.title = title;
         this.picture = picture;
         this.description = description;
         this.body = body;
         this.creator = creator;
+        this.category = category;
     }
 
     public Article() {
+    }
+
+    public Set<User> getFavoured() {
+        return favoured;
+    }
+
+    public void setFavoured(Set<User> favorited) {
+        this.favoured = favorited;
     }
 
     public long getId() {
@@ -113,19 +120,19 @@ public class Article {
         this.body = body;
     }
 
-    public LocalDate getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -137,11 +144,11 @@ public class Article {
         this.creator = creator;
     }
 
-    public Set<Category> getCategories() {
-        return categories;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

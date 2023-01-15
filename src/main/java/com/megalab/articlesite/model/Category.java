@@ -5,7 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "category")
+@Table(name = "category",
+        uniqueConstraints = {
+        @UniqueConstraint(columnNames = "name")
+})
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -13,7 +16,7 @@ public class Category {
     private Long id;
 
     @NotBlank
-    @Size(max=20)
+    @Size(max=25)
     String name;
 
 
