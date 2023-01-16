@@ -5,6 +5,7 @@ import com.megalab.articlesite.request.RequestCommentary;
 import com.megalab.articlesite.response.ResponseCommentary;
 import com.megalab.articlesite.security.jwt.response.ResponseMessage;
 import com.megalab.articlesite.service.CommentaryService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 public class CommentaryController {
     @Autowired
     CommentaryService commentaryService;
-
+    @Operation(summary = "Get all commentaries of an article")
     @GetMapping("/article/{article_id}/commentary")
     public ResponseEntity<List<ResponseCommentary>>getArticleCommentaries(@PathVariable long article_id){
         try {
@@ -25,7 +27,8 @@ public class CommentaryController {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
         }
     }
-    @PostMapping("/commentary")
+    @Operation(summary = "Save new Commentary")
+    @PostMapping("/user/commentary")
     public ResponseEntity<ResponseMessage>saveCommentary(@RequestBody RequestCommentary requestCommentary){
         try{
             commentaryService.saveCommentary(requestCommentary);
@@ -35,7 +38,8 @@ public class CommentaryController {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(e.getMessage()));
         }
     }
-    @PutMapping("/commentary/{id}")
+    @Operation(summary = "Edit existing commentary")
+    @PutMapping("/user/commentary/{id}")
     public ResponseEntity<ResponseMessage>editCommentary(@RequestBody RequestCommentary requestCommentary, @PathVariable long id){
         try{
 
@@ -46,7 +50,8 @@ public class CommentaryController {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(e.getMessage()));
         }
     }
-    @DeleteMapping("/commentary/{id}")
+    @Operation(summary = "Delete commentary")
+    @DeleteMapping("/user/commentary/{id}")
     public ResponseEntity<ResponseMessage>deleteCommentary( @PathVariable long id){
         try{
             commentaryService.deleteCommentary(id);
