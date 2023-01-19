@@ -23,6 +23,7 @@ public class RefreshTokenService {
     UserRepository userRepository;
 
     public RefreshToken createRefreshToken(Long userId){
+        deleteByUserId(userId);
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(userRepository.findUserById(userId).get());
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
